@@ -1090,28 +1090,8 @@ class TestDML(unittest.TestCase):
         dml.model_final = StatsModelsRLM()
         dml.refit()
 
-        with pytest.raises(AttributeError):
+        with pytest.raises(ValueError):
             ldml.model_final = StatsModelsRLM()
-
-        # can change the featurizer and refit, for either
-        ldml.featurizer = PolynomialFeatures(1, include_bias=False)
-        dml.featurizer = PolynomialFeatures(1, include_bias=False)
-        ldml.refit()
-        dml.refit()
-
-        # after setting linear_first_stages to True, can fit (but not refit)
-        ldml.linear_first_stages = True
-        dml.linear_first_stages = True
-        ldml.fit(y, T, X=X, W=W, cache_values=True)
-        dml.fit(y, T, X=X, W=W, cache_values=True)
-
-        # can't change the featurizer and refit if linear_first_stages is true
-        ldml.featurizer = None
-        dml.featurizer = None
-        with pytest.raises(Exception):
-            ldml.refit()
-        with pytest.raises(Exception):
-            dml.refit()
 
     def test_can_set_discrete_treatment(self):
         X = np.random.choice(np.arange(5), size=(500, 3))
@@ -1137,8 +1117,8 @@ class TestDML(unittest.TestCase):
         est1 = LinearDML(model_y=LinearRegression(), model_t=LinearRegression())
         est2 = LinearDML(model_y=LinearRegression(), model_t=LinearRegression(), monte_carlo_iterations=2)
         # Run ten experiments, recomputing the variance of 10 estimates of the effect in each experiment
-        v1s = [np.var([est.fit(y, T, W=W).effect() for _ in range(10)]) for _ in range(10)]
-        v2s = [np.var([est.fit(y, T, W=W).effect() for _ in range(10)]) for _ in range(10)]
+        v1s = [np.var([est1.fit(y, T, W=W).effect() for _ in range(10)]) for _ in range(10)]
+        v2s = [np.var([est2.fit(y, T, W=W).effect() for _ in range(10)]) for _ in range(10)]
         # The average variance should be lower when using monte carlo iterations
         assert np.mean(v2s) < np.mean(v1s)
 

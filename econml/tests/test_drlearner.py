@@ -795,7 +795,8 @@ class TestDRLearner(unittest.TestCase):
                 return super().fit(X, y)
 
         # test nested grouping
-        est = LinearDRLearner(LogisticRegression(), NestedModel(cv=2), n_splits=GroupKFold(2))
+        est = LinearDRLearner(model_propensity=LogisticRegression(),
+                              model_regression=NestedModel(cv=2), n_splits=GroupKFold(2))
         est.fit(y, t, W=w, groups=groups)
 
         # by default, we use 5 split cross-validation for our T and Y models

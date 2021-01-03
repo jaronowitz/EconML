@@ -298,8 +298,8 @@ class TestOrthoIV(unittest.TestCase):
         X = np.array([1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6]).reshape(-1, 1)
         est.fit(Y, T, Z=Z, X=X)
         assert isinstance(est.original_featurizer, PolynomialFeatures)
-        assert isinstance(est.featurizer, Pipeline)
-        assert isinstance(est.model_final, StatsModelsLinearRegression)
+        assert isinstance(est.featurizer_, Pipeline)
+        assert isinstance(est.model_final_, StatsModelsLinearRegression)
         for mdl in est.models_Y_X:
             assert isinstance(mdl, LinearRegression)
         for mdl in est.models_T_XZ:
@@ -313,8 +313,8 @@ class TestOrthoIV(unittest.TestCase):
                                       featurizer=None)
         est.fit(Y, T, Z=Z, X=X)
         assert est.original_featurizer is None
-        assert isinstance(est.featurizer, FunctionTransformer)
-        assert isinstance(est.model_final, StatsModelsLinearRegression)
+        assert isinstance(est.featurizer_, FunctionTransformer)
+        assert isinstance(est.model_final_, StatsModelsLinearRegression)
         for mdl in est.models_Y_X:
             assert isinstance(mdl, LinearRegression)
         for mdl in est.models_T_XZ:
