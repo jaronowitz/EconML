@@ -1135,6 +1135,5 @@ class TestDML(unittest.TestCase):
 
         assert isinstance(est.effect_inference(X), NormalInferenceResults)
 
-        est.refit(inference=BootstrapInference(2))
-
-        assert isinstance(est.effect_inference(X), EmpiricalInferenceResults)
+        with pytest.raises(ValueError):
+            est.refit(inference=BootstrapInference(2))

@@ -38,6 +38,7 @@ from sklearn.utils import check_random_state
 
 from .cate_estimator import (BaseCateEstimator, LinearCateEstimator,
                              TreatmentExpansionMixin)
+from .inference import BootstrapInference
 from .utilities import (_deprecate_positional, _EncoderWrapper, check_input_arrays,
                         cross_product, filter_none_kwargs,
                         inverse_onehot, ndim, reshape, shape, transpose)
@@ -643,6 +644,10 @@ class _OrthoLearner(ABC, TreatmentExpansionMixin, LinearCateEstimator):
 
         return self
 
+    @property
+    def _illegal_refit_inference_methods(self):
+        return (BootstrapInference,)
+
     def refit(self, inference=None):
         """
         Estimate the counterfactual model using a new final model specification but with cached first stage results.
@@ -656,6 +661,8 @@ class _OrthoLearner(ABC, TreatmentExpansionMixin, LinearCateEstimator):
             This instance
         """
         assert self._cached_values, "Refit can only be called if values were cached during the original fit"
+        if isinstance(self._get_inference(inference), self._illegal_refit_inference_methods):
+            raise ValueError("The chosen inference method does not allow only for model final re-fitting.")
         cached = self._cached_values
         kwargs = filter_none_kwargs(
             Y=cached.Y, T=cached.T, X=cached.X, W=cached.W, Z=cached.Z,
