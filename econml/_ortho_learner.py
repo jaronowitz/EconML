@@ -320,7 +320,7 @@ class _OrthoLearner(ABC, TreatmentExpansionMixin, LinearCateEstimator):
             def score(self, Y, T, W=None, nuisances=None):
                 Y_res, T_res = nuisances
                 return np.mean((Y_res - self.model.predict(T_res.reshape(-1, 1)))**2)
-        class OrthoLearner:
+        class OrthoLearner(_OrthoLearner):
             def _gen_ortho_learner_model_nuisance(self):
                 return ModelNuisance(LinearRegression(), LinearRegression())
             def _gen_ortho_learner_model_final(self):
@@ -376,7 +376,7 @@ class _OrthoLearner(ABC, TreatmentExpansionMixin, LinearCateEstimator):
                 Y_res, T_res = nuisances
                 return np.mean((Y_res - self.model.predict(T_res.reshape(-1, 1)))**2)
         from sklearn.linear_model import LogisticRegression
-        class OrthoLearner:
+        class OrthoLearner(_OrthoLearner):
             def _gen_ortho_learner_model_nuisance(self):
                 return ModelNuisance(LogisticRegression(solver='lbfgs'), LinearRegression())
             def _gen_ortho_learner_model_final(self):

@@ -1142,6 +1142,10 @@ class ForestDRLearner(ForestModelFinalCateEstimatorDiscreteMixin, DRLearner):
         Unless an iterable is used, we call `split(concat[W, X], T)` to generate the splits. If all
         W, X are None, then we call `split(ones((T.shape[0], 1)), T)`.
 
+    n_crossfit_splits: int or 'raise', optional (default='raise')
+        Deprecated by parameter `n_splits` and will be removed in next version. Can be used
+        interchangeably with `n_splits`.
+
     monte_carlo_iterations: int, optional (default=None)
         The number of times to rerun the first stage models to reduce the variance of the nuisances.
 
@@ -1266,6 +1270,7 @@ class ForestDRLearner(ForestModelFinalCateEstimatorDiscreteMixin, DRLearner):
                  min_propensity=1e-6,
                  categories='auto',
                  n_splits=2,
+                 n_crossfit_splits='raise',
                  monte_carlo_iterations=None,
                  n_estimators=1000,
                  criterion="mse",
@@ -1294,6 +1299,9 @@ class ForestDRLearner(ForestModelFinalCateEstimatorDiscreteMixin, DRLearner):
         self.honest = honest
         self.n_jobs = n_jobs
         self.verbose = verbose
+        self.n_crossfit_splits = n_crossfit_splits
+        if self.n_crossfit_splits != 'raise':
+            n_splits = self.n_crossfit_splits
         super().__init__(model_regression=model_regression,
                          model_propensity=model_propensity,
                          model_final=None,
@@ -1389,6 +1397,16 @@ class ForestDRLearner(ForestModelFinalCateEstimatorDiscreteMixin, DRLearner):
     def model_final(self, model):
         if model is not None:
             raise ValueError("Parameter `model_final` cannot be altered for this estimator!")
+
+    @property
+    def n_crossfit_splits(self):
+        return self.n_splits
+
+    @n_crossfit_splits.setter
+    def n_crossfit_splits(self, value):
+        if value != 'raise':
+            warn("Deprecated by parameter `n_splits` and will be removed in next version.")
+        self.n_splits = value
 
     def shap_values(self, X, *, feature_names=None, treatment_names=None, output_names=None):
         if self.featurizer_ is not None:
