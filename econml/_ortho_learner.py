@@ -507,7 +507,7 @@ class _OrthoLearner(ABC, TreatmentExpansionMixin, LinearCateEstimator):
 
     def _strata(self, Y, T, X=None, W=None, Z=None,
                 sample_weight=None, sample_var=None, groups=None,
-                cache_values=False, monte_carlo_iterations=None):
+                cache_values=False, only_final=False, check_input=True):
         if self.discrete_instrument:
             Z = LabelEncoder().fit_transform(np.ravel(Z))
 
