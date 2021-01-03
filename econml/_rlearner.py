@@ -353,3 +353,18 @@ class _RLearner(_OrthoLearner):
     @property
     def nuisance_scores_t(self):
         return self.nuisance_scores_[1]
+
+    @property
+    def residuals_(self):
+        """
+        A tuple (y_res, T_res, X, W), of the residuals from the first stage estimation
+        along with the associated X and W. Samples are not guaranteed to be in the same
+        order as the input order.
+        """
+        if not hasattr(self, '_cached_values'):
+            raise AttributeError("Estimator is not fitted yet!")
+        if self._cached_values is None:
+            raise AttributeError("`fit` was called with `cache_values=False`. "
+                                 "Set to `True` to enable residual storage.")
+        Y_res, T_res = self._cached_values.nuisances
+        return Y_res, T_res, self._cached_values.X, self._cached_values.W

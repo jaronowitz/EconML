@@ -331,3 +331,25 @@ class TestRefit(unittest.TestCase):
 
         with pytest.raises(ValueError):
             est.refit(inference=BootstrapInference(2))
+
+    def test_rlearner_residuals(self):
+        y, T, X, W = self._get_data()
+
+        dml = DML(model_y=LinearRegression(),
+                  model_t=LinearRegression(),
+                  n_splits=1,
+                  model_final=StatsModelsLinearRegression(fit_intercept=False),
+                  linear_first_stages=False,
+                  random_state=123)
+        with pytest.raises(AttributeError):
+            y_res, T_res, X_res, W_res = dml.residuals_
+        dml.fit(y, T, X=X, W=W)
+        with pytest.raises(AttributeError):
+            y_res, T_res, X_res, W_res = dml.residuals_
+        dml.fit(y, T, X=X, W=W, cache_values=True)
+        y_res, T_res, X_res, W_res = dml.residuals_
+        np.testing.assert_array_equal(X, X_res)
+        np.testing.assert_array_equal(W, W_res)
+        XW = np.hstack([X, W])
+        np.testing.assert_array_equal(y_res, y - LinearRegression().fit(XW, y).predict(XW))
+        np.testing.assert_array_equal(T_res, T - LinearRegression().fit(XW, T).predict(XW))

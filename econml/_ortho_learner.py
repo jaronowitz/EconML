@@ -424,7 +424,6 @@ class _OrthoLearner(ABC, TreatmentExpansionMixin, LinearCateEstimator):
     def __init__(self, *,
                  discrete_treatment, discrete_instrument, categories, n_splits, random_state,
                  mc_iters=None, mc_agg='mean'):
-        self._models_nuisance = None
         self.n_splits = n_splits
         self.discrete_treatment = discrete_treatment
         self.discrete_instrument = discrete_instrument
