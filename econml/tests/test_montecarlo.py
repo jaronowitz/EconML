@@ -1,8 +1,10 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
 
 import unittest
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LinearRegression, LogisticRegression
 from econml.dml import (DML, LinearDML, SparseLinearDML, KernelDML, NonParamDML, ForestDML)
 from econml.drlearner import (DRLearner, LinearDRLearner, SparseLinearDRLearner, ForestDRLearner)
 from econml.ortho_iv import (DMLATEIV, ProjectedDMLATEIV, DMLIV, NonParamDMLIV,
@@ -20,6 +22,25 @@ class TestMonteCarlo(unittest.TestCase):
         est1 = LinearDML(model_y=LinearRegression(), model_t=LinearRegression())
         est2 = LinearDML(model_y=LinearRegression(), model_t=LinearRegression(), mc_iters=2)
         est3 = LinearDML(model_y=LinearRegression(), model_t=LinearRegression(), mc_iters=2, mc_agg='median')
+        # Run ten experiments, recomputing the variance of 10 estimates of the effect in each experiment
+        v1s = [np.var([est1.fit(y, T, W=W).effect() for _ in range(10)]) for _ in range(10)]
+        v2s = [np.var([est2.fit(y, T, W=W).effect() for _ in range(10)]) for _ in range(10)]
+        v3s = [np.var([est3.fit(y, T, W=W).effect() for _ in range(10)]) for _ in range(10)]
+        # The average variance should be lower when using monte carlo iterations
+        assert np.mean(v2s) < np.mean(v1s)
+        assert np.mean(v3s) < np.mean(v1s)
+
+    def test_discrete_treatment(self):
+        """Test that we can perform nuisance averaging, and that it reduces the variance in a simple example."""
+        y = np.random.normal(size=30) + [0, 1] * 15
+        T = np.random.binomial(1, .5, size=(30,))
+        W = np.random.normal(size=(30, 3))
+        est1 = LinearDML(model_y=LinearRegression(), model_t=LogisticRegression(),
+                         discrete_treatment=True)
+        est2 = LinearDML(model_y=LinearRegression(), model_t=LogisticRegression(),
+                         discrete_treatment=True, mc_iters=2)
+        est3 = LinearDML(model_y=LinearRegression(), model_t=LogisticRegression(),
+                         discrete_treatment=True, mc_iters=2, mc_agg='median')
         # Run ten experiments, recomputing the variance of 10 estimates of the effect in each experiment
         v1s = [np.var([est1.fit(y, T, W=W).effect() for _ in range(10)]) for _ in range(10)]
         v2s = [np.var([est2.fit(y, T, W=W).effect() for _ in range(10)]) for _ in range(10)]

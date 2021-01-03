@@ -625,9 +625,11 @@ class _OrthoLearner(ABC, TreatmentExpansionMixin, LinearCateEstimator):
 
             if self.mc_iters is not None:
                 if self.mc_agg == 'mean':
-                    nuisances = np.mean(np.array(all_nuisances), axis=0)
+                    nuisances = tuple(np.mean(nuisance_mc_variants, axis=0)
+                                      for nuisance_mc_variants in list(zip(*all_nuisances)))
                 elif self.mc_agg == 'median':
-                    nuisances = np.median(np.array(all_nuisances), axis=0)
+                    nuisances = tuple(np.median(nuisance_mc_variants, axis=0)
+                                      for nuisance_mc_variants in list(zip(*all_nuisances)))
                 else:
                     raise ValueError(
                         "Parameter `mc_agg` must be one of {'mean', 'median'}. Got {}".format(self.mc_agg))
