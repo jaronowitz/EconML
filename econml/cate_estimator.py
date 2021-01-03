@@ -525,8 +525,11 @@ class LinearModelFinalCateEstimatorMixin(BaseCateEstimator):
     """
     Base class for models where the final stage is a linear model.
 
-    Subclasses must expose a ``model_final_`` attribute containing the model's
-    final stage model.
+    Such an estimator must implement a :attr:`model_final_` attribute that points
+    to the fitted final :class:`.StatsModelsLinearRegression` object that
+    represents the fitted CATE model. Also must implement :attr:`featurizer_` that points
+    to the fitted featurizer and :attr:`bias_part_of_coef` that designates
+    if the intercept is the first element of the :attr:`model_final_` coefficient.
 
     Attributes
     ----------
@@ -561,7 +564,7 @@ class LinearModelFinalCateEstimatorMixin(BaseCateEstimator):
         """
         return parse_final_model_params(self.model_final_.coef_, self.model_final_.intercept_,
                                         self._d_y, self._d_t, self._d_t_in, self.bias_part_of_coef,
-                                        self.fit_cate_intercept)[0]
+                                        self.fit_cate_intercept_)[0]
 
     @property
     def intercept_(self):
@@ -576,11 +579,11 @@ class LinearModelFinalCateEstimatorMixin(BaseCateEstimator):
             a vector and not a 2D array. For binary treatment the n_t dimension is
             also omitted.
         """
-        if not self.fit_cate_intercept:
+        if not self.fit_cate_intercept_:
             raise AttributeError("No intercept was fitted!")
         return parse_final_model_params(self.model_final_.coef_, self.model_final_.intercept_,
                                         self._d_y, self._d_t, self._d_t_in, self.bias_part_of_coef,
-                                        self.fit_cate_intercept)[1]
+                                        self.fit_cate_intercept_)[1]
 
     @BaseCateEstimator._defer_to_inference
     def coef__interval(self, *, alpha=0.1):
@@ -734,9 +737,11 @@ class StatsModelsCateEstimatorMixin(LinearModelFinalCateEstimatorMixin):
     Mixin class that offers `inference='statsmodels'` options to the CATE estimator
     that inherits it.
 
-    Such an estimator must implement a :attr:`model_final` attribute that points
+    Such an estimator must implement a :attr:`model_final_` attribute that points
     to the fitted final :class:`.StatsModelsLinearRegression` object that
-    represents the fitted CATE model.
+    represents the fitted CATE model. Also must implement :attr:`featurizer_` that points
+    to the fitted featurizer and :attr:`bias_part_of_coef` that designates
+    if the intercept is the first element of the :attr:`model_final_` coefficient.
     """
 
     def _get_inference_options(self):
@@ -820,7 +825,7 @@ class LinearModelFinalCateEstimatorDiscreteMixin(BaseCateEstimator):
         -------
         intercept: float or (n_y,) array like
         """
-        if not self.fit_cate_intercept:
+        if not self.fit_cate_intercept_:
             raise AttributeError("No intercept was fitted!")
         _, T = self._expand_treatments(None, T)
         ind = inverse_onehot(T).item() - 1

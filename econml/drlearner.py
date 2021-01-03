@@ -827,6 +827,10 @@ class LinearDRLearner(StatsModelsCateEstimatorDiscreteMixin, DRLearner):
         super().refit(inference=inference)
 
     @property
+    def fit_cate_intercept_(self):
+        return self.model_final_.fit_intercept
+
+    @property
     def multitask_model_cate(self):
         # Replacing this method which is invalid for this class, so that we make the
         # dosctring empty and not appear in the docs.
@@ -1081,6 +1085,10 @@ class SparseLinearDRLearner(DebiasedLassoCateEstimatorDiscreteMixin, DRLearner):
 
     def refit(self, *, inference='auto'):
         super().refit(inference=inference)
+
+    @property
+    def fit_cate_intercept_(self):
+        return self.model_final_.fit_intercept
 
     @property
     def multitask_model_final(self):

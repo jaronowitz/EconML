@@ -20,7 +20,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import FunctionTransformer
 
 from ._ortho_learner import _OrthoLearner
-from .cate_estimator import StatsModelsCateEstimatorMixin
+from .cate_estimator import LinearModelFinalCateEstimatorMixin, StatsModelsCateEstimatorMixin
 from .dml import _FinalWrapper
 from .inference import StatsModelsInference
 from .sklearn_extensions.linear_model import StatsModelsLinearRegression
@@ -726,7 +726,7 @@ class _BaseDMLIV(_OrthoLearner):
             raise AttributeError("Featurizer does not have a method: get_feature_names!")
 
 
-class DMLIV(_BaseDMLIV):
+class DMLIV(LinearModelFinalCateEstimatorMixin, _BaseDMLIV):
     """
     A child of the _BaseDMLIV class that specifies a particular effect model
     where the treatment effect is linear in some featurization of the variable X
@@ -835,6 +835,10 @@ class DMLIV(_BaseDMLIV):
     def bias_part_of_coef(self):
         return self.ortho_learner_model_final._model_final._fit_cate_intercept
 
+    @property
+    def fit_cate_intercept_(self):
+        return self.ortho_learner_model_final._model_final._fit_cate_intercept
+
 
 class NonParamDMLIV(_BaseDMLIV):
     """
@@ -916,7 +920,7 @@ class NonParamDMLIV(_BaseDMLIV):
     """
 
     def __init__(self, *, model_Y_X, model_T_X, model_T_XZ, model_final,
-                 featurizer=None, fit_cate_intercept=True,
+                 featurizer=None,
                  n_splits=2,
                  monte_carlo_iterations=None,
                  discrete_instrument=False,
@@ -928,7 +932,6 @@ class NonParamDMLIV(_BaseDMLIV):
         self.model_T_XZ = clone(model_T_XZ, safe=False)
         self.model_final = clone(model_final, safe=False)
         self.featurizer = clone(featurizer, safe=False)
-        self.fit_cate_intercept = fit_cate_intercept
         super().__init__(n_splits=n_splits,
                          monte_carlo_iterations=monte_carlo_iterations,
                          discrete_instrument=discrete_instrument,
@@ -943,7 +946,7 @@ class NonParamDMLIV(_BaseDMLIV):
 
     def _gen_ortho_learner_model_final(self):
         return _BaseDMLIVModelFinal(_FinalWrapper(clone(self.model_final, safe=False),
-                                                  fit_cate_intercept=self.fit_cate_intercept,
+                                                  fit_cate_intercept=False,
                                                   featurizer=clone(self.featurizer, safe=False),
                                                   use_weight_trick=True))
 
@@ -1654,6 +1657,10 @@ class LinearIntentToTreatDRIV(StatsModelsCateEstimatorMixin, IntentToTreatDRIV):
 
     @property
     def bias_part_of_coef(self):
+        return self.ortho_learner_model_final._fit_cate_intercept
+
+    @property
+    def fit_cate_intercept_(self):
         return self.ortho_learner_model_final._fit_cate_intercept
 
     @property

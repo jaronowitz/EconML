@@ -551,6 +551,10 @@ class DML(LinearModelFinalCateEstimatorMixin, _BaseDML):
     def bias_part_of_coef(self):
         return self.rlearner_model_final._fit_cate_intercept
 
+    @property
+    def fit_cate_intercept_(self):
+        return self.rlearner_model_final._fit_cate_intercept
+
 
 class LinearDML(StatsModelsCateEstimatorMixin, DML):
     """
@@ -1106,6 +1110,45 @@ class NonParamDML(_BaseDML):
 
     def _gen_rlearner_model_final(self):
         return _FinalWrapper(self._gen_model_final(), False, self.featurizer, True)
+
+    # override only so that we can update the docstring to indicate support for `StatsModelsInference`
+    @_deprecate_positional("X and W should be passed by keyword only. In a future release "
+                           "we will disallow passing X and W by position.", ['X', 'W'])
+    def fit(self, Y, T, X=None, W=None, *, sample_weight=None, sample_var=None, groups=None,
+            cache_values=False, inference='auto'):
+        """
+        Estimate the counterfactual model from data, i.e. estimates functions τ(·,·,·), ∂τ(·,·).
+
+        Parameters
+        ----------
+        Y: (n × d_y) matrix or vector of length n
+            Outcomes for each sample
+        T: (n × dₜ) matrix or vector of length n
+            Treatments for each sample
+        X: optional (n × dₓ) matrix
+            Features for each sample
+        W: optional (n × d_w) matrix
+            Controls for each sample
+        sample_weight: optional (n,) vector
+            Weights for each row
+        groups: (n,) vector, optional
+            All rows corresponding to the same group will be kept together during splitting.
+            If groups is not None, the n_splits argument passed to this class's initializer
+            must support a 'groups' argument to its split method.
+        cache_values: bool, default False
+            Whether to cache inputs and first stage results, which will allow refitting a different final model
+        inference: string, :class:`.Inference` instance, or None
+            Method for performing inference.  This estimator supports 'bootstrap'
+            (or an instance of :class:`.BootstrapInference`) and 'auto'
+            (or an instance of :class:`.GenericSingleTreatmentModelFinalInference`)
+
+        Returns
+        -------
+        self
+        """
+        return super().fit(Y, T, X=X, W=W, sample_weight=sample_weight, sample_var=sample_var, groups=groups,
+                           cache_values=cache_values,
+                           inference=inference)
 
     def refit(self, *, inference='auto'):
         super().refit(inference=inference)
