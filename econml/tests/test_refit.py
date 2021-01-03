@@ -160,11 +160,11 @@ class TestRefit(unittest.TestCase):
             with pytest.raises(ValueError):
                 est.model_final = LinearRegression()
             est.min_propensity = .1
-            est.monte_carlo_iterations = 2
+            est.mc_iters = 2
             est.featurizer = PolynomialFeatures(degree=2, include_bias=False)
             est.refit()
             assert isinstance(est.featurizer_, PolynomialFeatures)
-            np.testing.assert_equal(est.monte_carlo_iterations, 2)
+            np.testing.assert_equal(est.mc_iters, 2)
             intcpt = est.intercept_(T=1)
             est.fit_cate_intercept = False
             np.testing.assert_equal(est.intercept_(T=1), intcpt)
@@ -181,7 +181,7 @@ class TestRefit(unittest.TestCase):
         est = DMLATEIV(model_Y_W=LinearRegression(),
                        model_T_W=LinearRegression(),
                        model_Z_W=LinearRegression(),
-                       monte_carlo_iterations=2)
+                       mc_iters=2)
         est.fit(y, T, W=W, Z=Z, cache_values=True)
         est.refit()
         est.model_Y_W = Lasso()
@@ -195,7 +195,7 @@ class TestRefit(unittest.TestCase):
         est = ProjectedDMLATEIV(model_Y_W=LinearRegression(),
                                 model_T_W=LinearRegression(),
                                 model_T_WZ=LinearRegression(),
-                                monte_carlo_iterations=2)
+                                mc_iters=2)
         est.fit(y, T, W=W, Z=Z, cache_values=True)
         est.refit()
         est.model_Y_W = Lasso()
@@ -210,7 +210,7 @@ class TestRefit(unittest.TestCase):
                     model_T_X=LinearRegression(),
                     model_T_XZ=LinearRegression(),
                     model_final=LinearRegression(fit_intercept=False),
-                    monte_carlo_iterations=2)
+                    mc_iters=2)
         est.fit(y, T, X=X, Z=Z, cache_values=True)
         np.testing.assert_equal(len(est.coef_), X.shape[1])
         est.featurizer = PolynomialFeatures(degree=2, include_bias=False)
@@ -234,7 +234,7 @@ class TestRefit(unittest.TestCase):
                     model_T_X=LinearRegression(),
                     model_T_XZ=LinearRegression(),
                     model_final=LinearRegression(fit_intercept=False),
-                    monte_carlo_iterations=2)
+                    mc_iters=2)
         est.fit(y, T, X=X, Z=Z, cache_values=True)
         np.testing.assert_equal(len(est.coef_), X.shape[1])
         est.featurizer = PolynomialFeatures(degree=2, include_bias=False)
@@ -258,7 +258,7 @@ class TestRefit(unittest.TestCase):
                             model_T_X=LinearRegression(),
                             model_T_XZ=LinearRegression(),
                             model_final=LinearRegression(fit_intercept=True),
-                            monte_carlo_iterations=2)
+                            mc_iters=2)
         est.fit(y, T, X=X, Z=Z, cache_values=True)
         est.featurizer = PolynomialFeatures(degree=2, include_bias=False)
         est.model_final = WeightedLasso()

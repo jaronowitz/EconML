@@ -282,8 +282,12 @@ class _OrthoLearner(ABC, TreatmentExpansionMixin, LinearCateEstimator):
         If None, the random number generator is the :class:`~numpy.random.mtrand.RandomState` instance used
         by :mod:`np.random<numpy.random>`.
 
-    monte_carlo_iterations: int, optional (default=None)
+    mc_iters: int, optional (default=None)
         The number of times to rerun the first stage models to reduce the variance of the nuisances.
+
+    mc_agg: {'mean', 'median'}, optional (default='mean')
+        How to aggregate the nuisance value for each sample across the `mc_iters` monte carlo iterations of
+        cross-fitting.
 
     Examples
     --------
@@ -419,14 +423,15 @@ class _OrthoLearner(ABC, TreatmentExpansionMixin, LinearCateEstimator):
 
     def __init__(self, *,
                  discrete_treatment, discrete_instrument, categories, n_splits, random_state,
-                 monte_carlo_iterations=None):
+                 mc_iters=None, mc_agg='mean'):
         self._models_nuisance = None
         self.n_splits = n_splits
         self.discrete_treatment = discrete_treatment
         self.discrete_instrument = discrete_instrument
         self.random_state = random_state
         self.categories = categories
-        self.monte_carlo_iterations = monte_carlo_iterations
+        self.mc_iters = mc_iters
+        self.mc_agg = mc_agg
         super().__init__()
 
     @abstractmethod
@@ -610,7 +615,7 @@ class _OrthoLearner(ABC, TreatmentExpansionMixin, LinearCateEstimator):
             all_nuisances = []
             fitted_inds = None
 
-            for _ in range(self.monte_carlo_iterations or 1):
+            for _ in range(self.mc_iters or 1):
                 nuisances, new_inds = self._fit_nuisances(Y, T, X, W, Z, sample_weight=sample_weight, groups=groups)
                 all_nuisances.append(nuisances)
                 if fitted_inds is None:
@@ -618,9 +623,14 @@ class _OrthoLearner(ABC, TreatmentExpansionMixin, LinearCateEstimator):
                 elif not np.array_equal(fitted_inds, new_inds):
                     raise AttributeError("Different indices were fit by different folds, so they cannot be aggregated")
 
-            if self.monte_carlo_iterations is not None:
-                # TODO: support different ways to aggregate, like median?
-                nuisances = np.mean(np.array(all_nuisances), axis=0)
+            if self.mc_iters is not None:
+                if self.mc_agg == 'mean':
+                    nuisances = np.mean(np.array(all_nuisances), axis=0)
+                elif self.mc_agg == 'median':
+                    nuisances = np.median(np.array(all_nuisances), axis=0)
+                else:
+                    raise ValueError(
+                        "Parameter `mc_agg` must be one of {'mean', 'median'}. Got {}".format(self.mc_agg))
 
             Y, T, X, W, Z, sample_weight, sample_var = (self._subinds_check_none(arr, fitted_inds)
                                                         for arr in (Y, T, X, W, Z, sample_weight, sample_var))

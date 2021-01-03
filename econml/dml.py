@@ -434,17 +434,18 @@ class DML(LinearModelFinalCateEstimatorMixin, _BaseDML):
         Unless an iterable is used, we call `split(concat[W, X], T)` to generate the splits. If all
         W, X are None, then we call `split(ones((T.shape[0], 1)), T)`.
 
-    monte_carlo_iterations: int, optional (default=None)
+    mc_iters: int, optional (default=None)
         The number of times to rerun the first stage models to reduce the variance of the nuisances.
+
+    mc_agg: {'mean', 'median'}, optional (default='mean')
+        How to aggregate the nuisance value for each sample across the `mc_iters` monte carlo iterations of
+        cross-fitting.
 
     random_state: int, :class:`~numpy.random.mtrand.RandomState` instance or None, optional (default=None)
         If int, random_state is the seed used by the random number generator;
         If :class:`~numpy.random.mtrand.RandomState` instance, random_state is the random number generator;
         If None, the random number generator is the :class:`~numpy.random.mtrand.RandomState` instance used
         by :mod:`np.random<numpy.random>`.
-
-    monte_carlo_iterations: int, optional
-        The number of times to rerun the first stage models to reduce the variance of the nuisances.
     """
 
     def __init__(self,
@@ -455,7 +456,8 @@ class DML(LinearModelFinalCateEstimatorMixin, _BaseDML):
                  discrete_treatment=False,
                  categories='auto',
                  n_splits=2,
-                 monte_carlo_iterations=None,
+                 mc_iters=None,
+                 mc_agg='mean',
                  random_state=None):
 
         # set random_state and discrete_treatment now even though they're set by super's init
@@ -474,7 +476,8 @@ class DML(LinearModelFinalCateEstimatorMixin, _BaseDML):
         super().__init__(discrete_treatment=discrete_treatment,
                          categories=categories,
                          n_splits=n_splits,
-                         monte_carlo_iterations=monte_carlo_iterations,
+                         mc_iters=mc_iters,
+                         mc_agg=mc_agg,
                          random_state=random_state)
 
     def _gen_model_y(self):
@@ -609,17 +612,18 @@ class LinearDML(StatsModelsCateEstimatorMixin, DML):
 
         Unless an iterable is used, we call `split(X,T)` to generate the splits.
 
-    monte_carlo_iterations: int, optional (default=None)
+    mc_iters: int, optional (default=None)
         The number of times to rerun the first stage models to reduce the variance of the nuisances.
+
+    mc_agg: {'mean', 'median'}, optional (default='mean')
+        How to aggregate the nuisance value for each sample across the `mc_iters` monte carlo iterations of
+        cross-fitting.
 
     random_state: int, :class:`~numpy.random.mtrand.RandomState` instance or None, optional (default=None)
         If int, random_state is the seed used by the random number generator;
         If :class:`~numpy.random.mtrand.RandomState` instance, random_state is the random number generator;
         If None, the random number generator is the :class:`~numpy.random.mtrand.RandomState` instance used
         by :mod:`np.random<numpy.random>`.
-
-    monte_carlo_iterations: int, optional
-        The number of times to rerun the first stage models to reduce the variance of the nuisances.
     """
 
     def __init__(self,
@@ -630,7 +634,8 @@ class LinearDML(StatsModelsCateEstimatorMixin, DML):
                  discrete_treatment=False,
                  categories='auto',
                  n_splits=2,
-                 monte_carlo_iterations=None,
+                 mc_iters=None,
+                 mc_agg='mean',
                  random_state=None):
         super().__init__(model_y=model_y,
                          model_t=model_t,
@@ -641,7 +646,8 @@ class LinearDML(StatsModelsCateEstimatorMixin, DML):
                          discrete_treatment=discrete_treatment,
                          categories=categories,
                          n_splits=n_splits,
-                         monte_carlo_iterations=monte_carlo_iterations,
+                         mc_iters=mc_iters,
+                         mc_agg=mc_agg,
                          random_state=random_state,)
 
     def _gen_model_final(self):
@@ -774,17 +780,18 @@ class SparseLinearDML(DebiasedLassoCateEstimatorMixin, DML):
 
         Unless an iterable is used, we call `split(X,T)` to generate the splits.
 
-    monte_carlo_iterations: int, optional (default=None)
+    mc_iters: int, optional (default=None)
         The number of times to rerun the first stage models to reduce the variance of the nuisances.
+
+    mc_agg: {'mean', 'median'}, optional (default='mean')
+        How to aggregate the nuisance value for each sample across the `mc_iters` monte carlo iterations of
+        cross-fitting.
 
     random_state: int, :class:`~numpy.random.mtrand.RandomState` instance or None, optional (default=None)
         If int, random_state is the seed used by the random number generator;
         If :class:`~numpy.random.mtrand.RandomState` instance, random_state is the random number generator;
         If None, the random number generator is the :class:`~numpy.random.mtrand.RandomState` instance used
         by :mod:`np.random<numpy.random>`.
-
-    monte_carlo_iterations: int, optional
-        The number of times to rerun the first stage models to reduce the variance of the nuisances.
     """
 
     def __init__(self,
@@ -798,7 +805,8 @@ class SparseLinearDML(DebiasedLassoCateEstimatorMixin, DML):
                  discrete_treatment=False,
                  categories='auto',
                  n_splits=2,
-                 monte_carlo_iterations=None,
+                 mc_iters=None,
+                 mc_agg='mean',
                  random_state=None):
         self.alpha = alpha
         self.max_iter = max_iter
@@ -812,7 +820,8 @@ class SparseLinearDML(DebiasedLassoCateEstimatorMixin, DML):
                          discrete_treatment=discrete_treatment,
                          categories=categories,
                          n_splits=n_splits,
-                         monte_carlo_iterations=monte_carlo_iterations,
+                         mc_iters=mc_iters,
+                         mc_agg=mc_agg,
                          random_state=random_state)
 
     def _gen_model_final(self):
@@ -950,22 +959,23 @@ class KernelDML(DML):
 
         Unless an iterable is used, we call `split(X,T)` to generate the splits.
 
-    monte_carlo_iterations: int, optional (default=None)
+    mc_iters: int, optional (default=None)
         The number of times to rerun the first stage models to reduce the variance of the nuisances.
+
+    mc_agg: {'mean', 'median'}, optional (default='mean')
+        How to aggregate the nuisance value for each sample across the `mc_iters` monte carlo iterations of
+        cross-fitting.
 
     random_state: int, :class:`~numpy.random.mtrand.RandomState` instance or None, optional (default=None)
         If int, random_state is the seed used by the random number generator;
         If :class:`~numpy.random.mtrand.RandomState` instance, random_state is the random number generator;
         If None, the random number generator is the :class:`~numpy.random.mtrand.RandomState` instance used
         by :mod:`np.random<numpy.random>`.
-
-    monte_carlo_iterations: int, optional
-        The number of times to rerun the first stage models to reduce the variance of the nuisances.
     """
 
     def __init__(self, model_y='auto', model_t='auto', fit_cate_intercept=True,
                  dim=20, bw=1.0, discrete_treatment=False, categories='auto', n_splits=2,
-                 monte_carlo_iterations=None, random_state=None):
+                 mc_iters=None, mc_agg='mean', random_state=None):
         self.dim = dim
         self.bw = bw
         super().__init__(model_y=model_y,
@@ -976,7 +986,8 @@ class KernelDML(DML):
                          discrete_treatment=discrete_treatment,
                          categories=categories,
                          n_splits=n_splits,
-                         monte_carlo_iterations=monte_carlo_iterations,
+                         mc_iters=mc_iters,
+                         mc_agg=mc_agg,
                          random_state=random_state)
 
     def _gen_model_final(self):
@@ -1054,17 +1065,18 @@ class NonParamDML(_BaseDML):
         Unless an iterable is used, we call `split(concat[W, X], T)` to generate the splits. If all
         W, X are None, then we call `split(ones((T.shape[0], 1)), T)`.
 
-    monte_carlo_iterations: int, optional (default=None)
+    mc_iters: int, optional (default=None)
         The number of times to rerun the first stage models to reduce the variance of the nuisances.
+
+    mc_agg: {'mean', 'median'}, optional (default='mean')
+        How to aggregate the nuisance value for each sample across the `mc_iters` monte carlo iterations of
+        cross-fitting.
 
     random_state: int, :class:`~numpy.random.mtrand.RandomState` instance or None, optional (default=None)
         If int, random_state is the seed used by the random number generator;
         If :class:`~numpy.random.mtrand.RandomState` instance, random_state is the random number generator;
         If None, the random number generator is the :class:`~numpy.random.mtrand.RandomState` instance used
         by :mod:`np.random<numpy.random>`.
-
-    monte_carlo_iterations: int, optional
-        The number of times to rerun the first stage models to reduce the variance of the nuisances.
     """
 
     def __init__(self,
@@ -1073,7 +1085,8 @@ class NonParamDML(_BaseDML):
                  discrete_treatment=False,
                  categories='auto',
                  n_splits=2,
-                 monte_carlo_iterations=None,
+                 mc_iters=None,
+                 mc_agg='mean',
                  random_state=None):
 
         # TODO: consider whether we need more care around stateful featurizers,
@@ -1085,7 +1098,8 @@ class NonParamDML(_BaseDML):
         super().__init__(discrete_treatment=discrete_treatment,
                          categories=categories,
                          n_splits=n_splits,
-                         monte_carlo_iterations=monte_carlo_iterations,
+                         mc_iters=mc_iters,
+                         mc_agg=mc_agg,
                          random_state=random_state)
 
     def _get_inference_options(self):
@@ -1209,8 +1223,12 @@ class ForestDML(ForestModelFinalCateEstimatorMixin, NonParamDML):
         Deprecated by parameter `n_splits` and will be removed in next version. Can be used
         interchangeably with `n_splits`.
 
-    monte_carlo_iterations: int, optional (default=None)
+    mc_iters: int, optional (default=None)
         The number of times to rerun the first stage models to reduce the variance of the nuisances.
+
+    mc_agg: {'mean', 'median'}, optional (default='mean')
+        How to aggregate the nuisance value for each sample across the `mc_iters` monte carlo iterations of
+        cross-fitting.
 
     n_estimators : integer, optional (default=100)
         The total number of trees in the forest. The forest consists of a
@@ -1324,9 +1342,6 @@ class ForestDML(ForestModelFinalCateEstimatorMixin, NonParamDML):
         If :class:`~numpy.random.mtrand.RandomState` instance, random_state is the random number generator;
         If None, the random number generator is the :class:`~numpy.random.mtrand.RandomState` instance used
         by :mod:`np.random<numpy.random>`.
-
-    monte_carlo_iterations: int, optional
-        The number of times to rerun the first stage models to reduce the variance of the nuisances.
     """
 
     def __init__(self,
@@ -1336,7 +1351,8 @@ class ForestDML(ForestModelFinalCateEstimatorMixin, NonParamDML):
                  categories='auto',
                  n_splits=2,
                  n_crossfit_splits='raise',
-                 monte_carlo_iterations=None,
+                 mc_iters=None,
+                 mc_agg='mean',
                  n_estimators=100,
                  criterion="mse",
                  max_depth=None,
@@ -1374,7 +1390,8 @@ class ForestDML(ForestModelFinalCateEstimatorMixin, NonParamDML):
                          discrete_treatment=discrete_treatment,
                          categories=categories,
                          n_splits=n_splits,
-                         monte_carlo_iterations=monte_carlo_iterations,
+                         mc_iters=mc_iters,
+                         mc_agg=mc_agg,
                          random_state=random_state)
 
     def _gen_model_final(self):

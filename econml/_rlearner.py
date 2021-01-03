@@ -170,8 +170,12 @@ class _RLearner(_OrthoLearner):
         If None, the random number generator is the :class:`~numpy.random.mtrand.RandomState` instance used
         by :mod:`np.random<numpy.random>`.
 
-    monte_carlo_iterations: int, optional
+    mc_iters: int, optional
         The number of times to rerun the first stage models to reduce the variance of the nuisances.
+
+    mc_agg: {'mean', 'median'}, optional (default='mean')
+        How to aggregate the nuisance value for each sample across the `mc_iters` monte carlo iterations of
+        cross-fitting.
 
     Attributes
     ----------
@@ -198,13 +202,14 @@ class _RLearner(_OrthoLearner):
         is multidimensional, then the average of the MSEs for each dimension of Y is returned.
     """
 
-    def __init__(self, *, discrete_treatment, categories, n_splits, random_state, monte_carlo_iterations=None):
+    def __init__(self, *, discrete_treatment, categories, n_splits, random_state, mc_iters=None, mc_agg='mean'):
         super().__init__(discrete_treatment=discrete_treatment,
                          discrete_instrument=False,  # no instrument, so doesn't matter
                          categories=categories,
                          n_splits=n_splits,
                          random_state=random_state,
-                         monte_carlo_iterations=monte_carlo_iterations)
+                         mc_iters=mc_iters,
+                         mc_agg=mc_agg)
 
     @abstractmethod
     def _gen_model_y(self):
