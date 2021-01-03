@@ -269,13 +269,14 @@ class TestOrthoIV(unittest.TestCase):
         three_class = np.array([1, 2, 3, 1, 2, 3, 1, 2])
         two_class = np.array([1, 2, 1, 1, 2, 1, 1, 2])
 
-        est = NonParamDMLIV(Lasso(), LogisticRegression(), LogisticRegression(),
-                            WeightedLasso(), discrete_treatment=True)
+        est = NonParamDMLIV(model_Y_X=Lasso(), model_T_X=LogisticRegression(), model_T_XZ=LogisticRegression(),
+                            model_final=WeightedLasso(), discrete_treatment=True)
 
         with pytest.raises(AttributeError):
             est.fit(Y, T=three_class, Z=two_class)
 
-        est = IntentToTreatDRIV(Lasso(), LogisticRegression(), WeightedLasso())
+        est = IntentToTreatDRIV(model_Y_X=Lasso(), model_T_XZ=LogisticRegression(),
+                                flexible_model_effect=WeightedLasso())
 
         with pytest.raises(AttributeError):
             est.fit(Y, T=three_class, Z=two_class)

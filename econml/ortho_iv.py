@@ -808,8 +808,8 @@ class DMLIV(_BaseDMLIV):
                  discrete_instrument=False, discrete_treatment=False,
                  categories='auto', random_state=None):
         self.model_Y_X = clone(model_Y_X, safe=False)
-        self.model_T_X = clone(model_Y_X, safe=False)
-        self.model_T_XZ = clone(model_Y_X, safe=False)
+        self.model_T_X = clone(model_T_X, safe=False)
+        self.model_T_XZ = clone(model_T_XZ, safe=False)
         self.model_final = clone(model_final, safe=False)
         self.featurizer = clone(featurizer, safe=False)
         self.fit_cate_intercept = fit_cate_intercept
@@ -924,8 +924,8 @@ class NonParamDMLIV(_BaseDMLIV):
                  categories='auto',
                  random_state=None):
         self.model_Y_X = clone(model_Y_X, safe=False)
-        self.model_T_X = clone(model_Y_X, safe=False)
-        self.model_T_XZ = clone(model_Y_X, safe=False)
+        self.model_T_X = clone(model_T_X, safe=False)
+        self.model_T_XZ = clone(model_T_XZ, safe=False)
         self.model_final = clone(model_final, safe=False)
         self.featurizer = clone(featurizer, safe=False)
         self.fit_cate_intercept = fit_cate_intercept
@@ -1465,7 +1465,7 @@ class IntentToTreatDRIV(_IntentToTreatDRIV):
                  opt_reweighted=False,
                  categories='auto',
                  random_state=None):
-        self.flexible_model_effect = flexible_model_effect
+        self.flexible_model_effect = clone(flexible_model_effect, safe=False)
         super().__init__(model_Y_X=model_Y_X,
                          model_T_XZ=model_T_XZ,
                          prel_model_effect=None,

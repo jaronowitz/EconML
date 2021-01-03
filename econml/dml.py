@@ -860,7 +860,7 @@ class SparseLinearDML(DebiasedLassoCateEstimatorMixin, DML):
             warn("This estimator does not yet support sample variances and inference does not take "
                  "sample variances into account. This feature will be supported in a future release.")
         check_high_dimensional(X, T, threshold=5, featurizer=self.featurizer,
-                               discrete_treatment=self._discrete_treatment,
+                               discrete_treatment=self.discrete_treatment,
                                msg="The number of features in the final model (< 5) is too small for a sparse model. "
                                "We recommend using the LinearDML estimator for this low-dimensional setting.")
         return super().fit(Y, T, X=X, W=W,

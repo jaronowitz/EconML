@@ -613,7 +613,7 @@ class DRLearner(_OrthoLearner):
             F = X
         feature_names = self.cate_feature_names(feature_names)
 
-        if self._multitask_model_final:
+        if self.ortho_learner_model_final._multitask_model_final:
             return _shap_explain_multitask_model_cate(self.const_marginal_effect, self.multitask_model_cate, F,
                                                       self._d_t, self._d_y, feature_names,
                                                       treatment_names, output_names)
@@ -1007,6 +1007,9 @@ class SparseLinearDRLearner(DebiasedLassoCateEstimatorDiscreteMixin, DRLearner):
                  monte_carlo_iterations=None,
                  random_state=None):
         self.fit_cate_intercept = fit_cate_intercept
+        self.alpha = alpha
+        self.max_iter = max_iter
+        self.tol = tol
         super().__init__(model_propensity=model_propensity,
                          model_regression=model_regression,
                          model_final=None,
