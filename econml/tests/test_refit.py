@@ -8,7 +8,7 @@ from sklearn.pipeline import Pipeline
 from econml.dml import (DML, LinearDML, SparseLinearDML, KernelDML, NonParamDML, ForestDML)
 from econml.drlearner import (DRLearner, LinearDRLearner, SparseLinearDRLearner, ForestDRLearner)
 from econml.ortho_iv import (DMLATEIV, ProjectedDMLATEIV, DMLIV, NonParamDMLIV,
-                             LinearIntentToTreatDRIV)
+                             IntentToTreatDRIV, LinearIntentToTreatDRIV)
 from econml.sklearn_extensions.linear_model import (DebiasedLasso, WeightedLasso,
                                                     StatsModelsRLM, StatsModelsLinearRegression)
 from econml.inference import NormalInferenceResults, BootstrapInference
