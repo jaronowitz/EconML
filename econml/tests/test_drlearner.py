@@ -451,7 +451,7 @@ class TestDRLearner(unittest.TestCase):
                                             out_feat_names = featurizer.fit(
                                                 X).get_feature_names(feature_names)
                                             np.testing.assert_array_equal(
-                                                est.featurizer.n_input_features_, 3)
+                                                est.featurizer_.n_input_features_, 3)
                                         np.testing.assert_array_equal(est.cate_feature_names(feature_names),
                                                                       out_feat_names)
 
@@ -607,7 +607,7 @@ class TestDRLearner(unittest.TestCase):
                                             out_feat_names = featurizer.fit(
                                                 X).get_feature_names(feature_names)
                                             np.testing.assert_array_equal(
-                                                est.featurizer.n_input_features_, 2)
+                                                est.featurizer_.n_input_features_, 2)
                                         np.testing.assert_array_equal(est.cate_feature_names(feature_names),
                                                                       out_feat_names)
 
@@ -767,7 +767,8 @@ class TestDRLearner(unittest.TestCase):
 
         # test outer grouping
         # NOTE: we should ideally use a stratified split with grouping, but sklearn doesn't have one yet
-        est = LinearDRLearner(LogisticRegression(), LinearRegression(), n_splits=GroupKFold(2))
+        est = LinearDRLearner(model_propensity=LogisticRegression(),
+                              model_regression=LinearRegression(), n_splits=GroupKFold(2))
         est.fit(y, t, W=w, groups=groups)
 
         # test nested grouping

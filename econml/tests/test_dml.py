@@ -555,7 +555,7 @@ class TestDML(unittest.TestCase):
                   discrete_treatment=True)
         est.fit(Y, T, X=X)
         assert isinstance(est.original_featurizer, PolynomialFeatures)
-        assert isinstance(est.featurizer, Pipeline)
+        assert isinstance(est.featurizer_, Pipeline)
         assert isinstance(est.model_cate, WeightedLasso)
         for mdl in est.models_y:
             assert isinstance(mdl, WeightedLasso)
@@ -571,7 +571,7 @@ class TestDML(unittest.TestCase):
                   discrete_treatment=True)
         est.fit(Y, T, X=X)
         assert est.original_featurizer is None
-        assert isinstance(est.featurizer, FunctionTransformer)
+        assert isinstance(est.featurizer_, FunctionTransformer)
         assert isinstance(est.model_cate, WeightedLasso)
         for mdl in est.models_y:
             assert isinstance(mdl, WeightedLasso)

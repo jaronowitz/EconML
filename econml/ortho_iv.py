@@ -372,7 +372,7 @@ class ProjectedDMLATEIV(_BaseDMLATEIV):
             model_Y_W=_FirstStageWrapper(clone(self.model_Y_W, safe=False), discrete_target=False),
             model_T_W=_FirstStageWrapper(clone(self.model_T_W, safe=False), discrete_target=self.discrete_treatment),
             model_T_WZ=_FirstStageWrapper(clone(self.model_T_WZ, safe=False),
-                                          discrete_target=self.discrete_instrument))
+                                          discrete_target=self.discrete_treatment))
 
 
 class _BaseDMLIVModelNuisance:

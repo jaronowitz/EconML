@@ -223,12 +223,12 @@ class TestOrthoLearner(unittest.TestCase):
         est = OrthoLearner(n_splits=folds, discrete_treatment=False,
                            discrete_instrument=False, categories='auto', random_state=None)
         est.fit(y, X[:, 0], X=None, W=X[:, 1:])
-        np.testing.assert_almost_equal(est.const_marginal_effect(), 1, decimal=3)
-        np.testing.assert_array_almost_equal(est.effect(), np.ones(1), decimal=3)
+        np.testing.assert_almost_equal(est.const_marginal_effect(), 1, decimal=2)
+        np.testing.assert_array_almost_equal(est.effect(), np.ones(1), decimal=2)
         np.testing.assert_array_almost_equal(est.effect(T0=0, T1=10), np.ones(1) * 10, decimal=2)
-        np.testing.assert_almost_equal(est.score(y, X[:, 0], W=X[:, 1:]), sigma**2, decimal=3)
-        np.testing.assert_almost_equal(est.score_, sigma**2, decimal=3)
-        np.testing.assert_almost_equal(est.ortho_learner_model_final.model.coef_[0], 1, decimal=3)
+        np.testing.assert_almost_equal(est.score(y, X[:, 0], W=X[:, 1:]), sigma**2, decimal=2)
+        np.testing.assert_almost_equal(est.score_, sigma**2, decimal=2)
+        np.testing.assert_almost_equal(est.ortho_learner_model_final.model.coef_[0], 1, decimal=2)
 
     def test_ol_no_score_final(self):
         class ModelNuisance:
