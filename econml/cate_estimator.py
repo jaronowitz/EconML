@@ -525,7 +525,7 @@ class LinearModelFinalCateEstimatorMixin(BaseCateEstimator):
     """
     Base class for models where the final stage is a linear model.
 
-    Subclasses must expose a ``model_final`` attribute containing the model's
+    Subclasses must expose a ``model_final_`` attribute containing the model's
     final stage model.
 
     Attributes
@@ -718,16 +718,14 @@ class LinearModelFinalCateEstimatorMixin(BaseCateEstimator):
 
     def shap_values(self, X, *, feature_names=None, treatment_names=None, output_names=None):
         (dt, dy, treatment_names, output_names) = _define_names(self._d_t, self._d_y, treatment_names, output_names)
-        if hasattr(self, "featurizer") and self.featurizer is not None:
-            X = self.featurizer.transform(X)
+        if hasattr(self, "featurizer_") and self.featurizer_ is not None:
+            X = self.featurizer_.transform(X)
         X, T = broadcast_unit_treatments(X, dt)
-        d_x = X.shape[1]
         X_new = cross_product(X, T)
         feature_names = self.cate_feature_names(feature_names)
-        return _shap_explain_joint_linear_model_cate(self.model_final, X_new, T, dt, dy, self.fit_cate_intercept,
+        return _shap_explain_joint_linear_model_cate(self.model_final_, X_new, T, dt, dy, self.bias_part_of_coef,
                                                      feature_names=feature_names, treatment_names=treatment_names,
                                                      output_names=output_names)
-
     shap_values.__doc__ = LinearCateEstimator.shap_values.__doc__
 
 
