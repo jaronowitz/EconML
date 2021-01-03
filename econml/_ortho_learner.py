@@ -350,13 +350,13 @@ class _OrthoLearner(ABC, TreatmentExpansionMixin, LinearCateEstimator):
                                 sample_weight=sample_weight, sample_var=sample_var)
                 model_final.predict(X=X)
 
-            Predict, should just take the features X and return the constant marginal effect. In fact we allow for the
-            model method signatures to skip any of the keyword arguments as long as the class is always called with the
-            omitted keyword argument set to ``None``. Moreover, the predict function of the final model can take no
-            argument if the class is always called with ``X=None``. This can be enforced in child classes by
-            re-implementing the fit and the various effect methods. If ``discrete_treatment=True``, then the input ``T``
-            to both above calls will be the one-hot encoding of the original input ``T``, excluding the first column of
-            the one-hot.
+            Predict, should just take the features X and return the constant marginal effect. In fact we allow
+            for the model method signatures to skip any of the keyword arguments as long as the class is always
+            called with the omitted keyword argument set to ``None``. Moreover, the predict function of the final
+            model can take no argument if the class is always called with ``X=None``. This can be enforced in child
+            classes by re-implementing the fit and the various effect methods. If ``discrete_treatment=True``,
+            then the input ``T`` to both above calls will be the one-hot encoding of the original input ``T``,
+            excluding the first column of the one-hot.
         """
         pass
 

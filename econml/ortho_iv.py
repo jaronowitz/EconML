@@ -1671,5 +1671,5 @@ class LinearIntentToTreatDRIV(StatsModelsCateEstimatorMixin, IntentToTreatDRIV):
 
     @opt_reweighted.setter
     def opt_reweighted(self, value):
-        if not (value == False):
+        if not (value is False):
             raise ValueError("Parameter `value` cannot be altered from `False` for this estimator.")
