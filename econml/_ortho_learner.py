@@ -286,12 +286,15 @@ class _OrthoLearner(ABC, TreatmentExpansionMixin, LinearCateEstimator):
 
     Examples
     --------
+
     The example code below implements a very simple version of the double machine learning
     method on top of the :class:`._OrthoLearner` class, for expository purposes.
     For a more elaborate implementation of a Double Machine Learning child class of the class
     :class:`._OrthoLearner` check out :class:`.DML`
     and its child classes:
+
     .. testcode::
+
         import numpy as np
         from sklearn.linear_model import LinearRegression
         from econml._ortho_learner import _OrthoLearner
@@ -328,6 +331,7 @@ class _OrthoLearner(ABC, TreatmentExpansionMixin, LinearCateEstimator):
         est = OrthoLearner(n_splits=2, discrete_treatment=False, discrete_instrument=False,
                            categories='auto', random_state=None)
         est.fit(y, X[:, 0], W=X[:, 1:])
+
     >>> est.score_
     0.00756830...
     >>> est.const_marginal_effect()
@@ -342,9 +346,12 @@ class _OrthoLearner(ABC, TreatmentExpansionMixin, LinearCateEstimator):
     LinearRegression(fit_intercept=False)
     >>> est.ortho_learner_model_final.model.coef_
     array([1.023649...])
+
     The following example shows how to do double machine learning with discrete treatments, using
     the _OrthoLearner:
+
     .. testcode::
+
         class ModelNuisance:
             def __init__(self, model_t, model_y):
                 self._model_t = model_t
@@ -382,6 +389,7 @@ class _OrthoLearner(ABC, TreatmentExpansionMixin, LinearCateEstimator):
         est = OrthoLearner(n_splits=2, discrete_treatment=True, discrete_instrument=False,
                            categories='auto', random_state=None)
         est.fit(y, T, W=W)
+
     >>> est.score_
     0.00673015...
     >>> est.const_marginal_effect()
