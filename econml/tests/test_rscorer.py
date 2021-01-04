@@ -38,21 +38,21 @@ class TestRScorer(unittest.TestCase):
         X_train, X_val, T_train, T_val, Y_train, Y_val = train_test_split(X, T, y, test_size=.4)
 
         models = [('ldml', LinearDML(model_y=reg(), model_t=clf(), discrete_treatment=True,
-                                     linear_first_stages=False, n_splits=3)),
+                                     linear_first_stages=False, cv=3)),
                   ('sldml', SparseLinearDML(model_y=reg(), model_t=clf(), discrete_treatment=True,
                                             featurizer=PolynomialFeatures(degree=2, include_bias=False),
-                                            linear_first_stages=False, n_splits=3)),
+                                            linear_first_stages=False, cv=3)),
                   ('xlearner', XLearner(models=reg(), cate_models=reg(), propensity_model=clf())),
                   ('dalearner', DomainAdaptationLearner(models=reg(), final_models=reg(), propensity_model=clf())),
                   ('slearner', SLearner(overall_model=reg())),
                   ('tlearner', TLearner(models=reg())),
                   ('drlearner', DRLearner(model_propensity=clf(), model_regression=reg(),
-                                          model_final=reg(), n_splits=3)),
+                                          model_final=reg(), cv=3)),
                   ('rlearner', NonParamDML(model_y=reg(), model_t=clf(), model_final=reg(),
-                                           discrete_treatment=True, n_splits=3)),
+                                           discrete_treatment=True, cv=3)),
                   ('dml3dlasso', DML(model_y=reg(), model_t=clf(), model_final=reg(), discrete_treatment=True,
                                      featurizer=PolynomialFeatures(degree=3),
-                                     linear_first_stages=False, n_splits=3))
+                                     linear_first_stages=False, cv=3))
                   ]
 
         models = Parallel(n_jobs=-1, verbose=1)(delayed(_fit_model)(name, mdl,
@@ -60,7 +60,7 @@ class TestRScorer(unittest.TestCase):
                                                 for name, mdl in models)
 
         scorer = RScorer(model_y=reg(), model_t=clf(),
-                         discrete_treatment=True, n_splits=3, mc_iters=2, mc_agg='median')
+                         discrete_treatment=True, cv=3, mc_iters=2, mc_agg='median')
         scorer.fit(Y_val, T_val, X=X_val)
         rscore = [scorer.score(mdl) for _, mdl in models]
         expected_te_val = np.zeros(X_val.shape[0])

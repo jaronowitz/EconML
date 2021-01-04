@@ -417,7 +417,7 @@ class DML(LinearModelFinalCateEstimatorMixin, _BaseDML):
         The categories to use when encoding discrete treatments (or 'auto' to use the unique sorted values).
         The first category will be treated as the control treatment.
 
-    n_splits: int, cross-validation generator or an iterable, optional, default 2
+    cv: int, cross-validation generator or an iterable, optional, default 2
         Determines the cross-validation splitting strategy.
         Possible inputs for cv are:
 
@@ -455,7 +455,8 @@ class DML(LinearModelFinalCateEstimatorMixin, _BaseDML):
                  linear_first_stages=False,
                  discrete_treatment=False,
                  categories='auto',
-                 n_splits=2,
+                 cv=2,
+                 n_splits='raise',
                  mc_iters=None,
                  mc_agg='mean',
                  random_state=None):
@@ -475,6 +476,7 @@ class DML(LinearModelFinalCateEstimatorMixin, _BaseDML):
         self.model_final = clone(model_final, safe=False)
         super().__init__(discrete_treatment=discrete_treatment,
                          categories=categories,
+                         cv=cv,
                          n_splits=n_splits,
                          mc_iters=mc_iters,
                          mc_agg=mc_agg,
@@ -530,7 +532,7 @@ class DML(LinearModelFinalCateEstimatorMixin, _BaseDML):
             Weights for each row
         groups: (n,) vector, optional
             All rows corresponding to the same group will be kept together during splitting.
-            If groups is not None, the n_splits argument passed to this class's initializer
+            If groups is not None, the `cv` argument passed to this class's initializer
             must support a 'groups' argument to its split method.
         cache_values: bool, default False
             Whether to cache inputs and first stage results, which will allow refitting a different final model
@@ -597,7 +599,7 @@ class LinearDML(StatsModelsCateEstimatorMixin, DML):
         The categories to use when encoding discrete treatments (or 'auto' to use the unique sorted values).
         The first category will be treated as the control treatment.
 
-    n_splits: int, cross-validation generator or an iterable, optional (Default=2)
+    cv: int, cross-validation generator or an iterable, optional (Default=2)
         Determines the cross-validation splitting strategy.
         Possible inputs for cv are:
 
@@ -634,7 +636,8 @@ class LinearDML(StatsModelsCateEstimatorMixin, DML):
                  linear_first_stages=True,
                  discrete_treatment=False,
                  categories='auto',
-                 n_splits=2,
+                 cv=2,
+                 n_splits='raise',
                  mc_iters=None,
                  mc_agg='mean',
                  random_state=None):
@@ -646,6 +649,7 @@ class LinearDML(StatsModelsCateEstimatorMixin, DML):
                          linear_first_stages=linear_first_stages,
                          discrete_treatment=discrete_treatment,
                          categories=categories,
+                         cv=cv,
                          n_splits=n_splits,
                          mc_iters=mc_iters,
                          mc_agg=mc_agg,
@@ -678,7 +682,7 @@ class LinearDML(StatsModelsCateEstimatorMixin, DML):
             Sample variance for each sample
         groups: (n,) vector, optional
             All rows corresponding to the same group will be kept together during splitting.
-            If groups is not None, the n_splits argument passed to this class's initializer
+            If groups is not None, the `cv` argument passed to this class's initializer
             must support a 'groups' argument to its split method.
         cache_values: bool, default False
             Whether to cache inputs and first stage results, which will allow refitting a different final model
@@ -765,7 +769,7 @@ class SparseLinearDML(DebiasedLassoCateEstimatorMixin, DML):
         The categories to use when encoding discrete treatments (or 'auto' to use the unique sorted values).
         The first category will be treated as the control treatment.
 
-    n_splits: int, cross-validation generator or an iterable, optional (Default=2)
+    cv: int, cross-validation generator or an iterable, optional (Default=2)
         Determines the cross-validation splitting strategy.
         Possible inputs for cv are:
 
@@ -805,7 +809,8 @@ class SparseLinearDML(DebiasedLassoCateEstimatorMixin, DML):
                  linear_first_stages=True,
                  discrete_treatment=False,
                  categories='auto',
-                 n_splits=2,
+                 cv=2,
+                 n_splits='raise',
                  mc_iters=None,
                  mc_agg='mean',
                  random_state=None):
@@ -820,6 +825,7 @@ class SparseLinearDML(DebiasedLassoCateEstimatorMixin, DML):
                          linear_first_stages=linear_first_stages,
                          discrete_treatment=discrete_treatment,
                          categories=categories,
+                         cv=cv,
                          n_splits=n_splits,
                          mc_iters=mc_iters,
                          mc_agg=mc_agg,
@@ -856,7 +862,7 @@ class SparseLinearDML(DebiasedLassoCateEstimatorMixin, DML):
             not in use by this method but will be supported in a future release.
         groups: (n,) vector, optional
             All rows corresponding to the same group will be kept together during splitting.
-            If groups is not None, the n_splits argument passed to this class's initializer
+            If groups is not None, the `cv` argument passed to this class's initializer
             must support a 'groups' argument to its split method.
         cache_values: bool, default False
             Whether to cache inputs and first stage results, which will allow refitting a different final model
@@ -944,7 +950,7 @@ class KernelDML(DML):
         The categories to use when encoding discrete treatments (or 'auto' to use the unique sorted values).
         The first category will be treated as the control treatment.
 
-    n_splits: int, cross-validation generator or an iterable, optional (Default=2)
+    cv: int, cross-validation generator or an iterable, optional (Default=2)
         Determines the cross-validation splitting strategy.
         Possible inputs for cv are:
 
@@ -974,9 +980,15 @@ class KernelDML(DML):
         by :mod:`np.random<numpy.random>`.
     """
 
-    def __init__(self, model_y='auto', model_t='auto', fit_cate_intercept=True,
-                 dim=20, bw=1.0, discrete_treatment=False, categories='auto', n_splits=2,
-                 mc_iters=None, mc_agg='mean', random_state=None):
+    def __init__(self, model_y='auto', model_t='auto',
+                 discrete_treatment=False, categories='auto',
+                 fit_cate_intercept=True,
+                 dim=20,
+                 bw=1.0,
+                 cv=2,
+                 n_splits='raise',
+                 mc_iters=None, mc_agg='mean',
+                 random_state=None):
         self.dim = dim
         self.bw = bw
         super().__init__(model_y=model_y,
@@ -986,6 +998,7 @@ class KernelDML(DML):
                          fit_cate_intercept=fit_cate_intercept,
                          discrete_treatment=discrete_treatment,
                          categories=categories,
+                         cv=cv,
                          n_splits=n_splits,
                          mc_iters=mc_iters,
                          mc_agg=mc_agg,
@@ -1049,7 +1062,7 @@ class NonParamDML(_BaseDML):
         The categories to use when encoding discrete treatments (or 'auto' to use the unique sorted values).
         The first category will be treated as the control treatment.
 
-    n_splits: int, cross-validation generator or an iterable, optional (Default=2)
+    cv: int, cross-validation generator or an iterable, optional (Default=2)
         Determines the cross-validation splitting strategy.
         Possible inputs for cv are:
 
@@ -1085,7 +1098,8 @@ class NonParamDML(_BaseDML):
                  featurizer=None,
                  discrete_treatment=False,
                  categories='auto',
-                 n_splits=2,
+                 cv=2,
+                 n_splits='raise',
                  mc_iters=None,
                  mc_agg='mean',
                  random_state=None):
@@ -1098,6 +1112,7 @@ class NonParamDML(_BaseDML):
         self.model_final = clone(model_final, safe=False)
         super().__init__(discrete_treatment=discrete_treatment,
                          categories=categories,
+                         cv=cv,
                          n_splits=n_splits,
                          mc_iters=mc_iters,
                          mc_agg=mc_agg,
@@ -1148,7 +1163,7 @@ class NonParamDML(_BaseDML):
             Weights for each row
         groups: (n,) vector, optional
             All rows corresponding to the same group will be kept together during splitting.
-            If groups is not None, the n_splits argument passed to this class's initializer
+            If groups is not None, the `cv` argument passed to this class's initializer
             must support a 'groups' argument to its split method.
         cache_values: bool, default False
             Whether to cache inputs and first stage results, which will allow refitting a different final model
@@ -1204,7 +1219,7 @@ class ForestDML(ForestModelFinalCateEstimatorMixin, NonParamDML):
         The categories to use when encoding discrete treatments (or 'auto' to use the unique sorted values).
         The first category will be treated as the control treatment.
 
-    n_splits: int, cross-validation generator or an iterable, optional (Default=2)
+    cv: int, cross-validation generator or an iterable, optional (Default=2)
         Determines the cross-validation splitting strategy.
         Possible inputs for cv are:
 
@@ -1222,8 +1237,8 @@ class ForestDML(ForestModelFinalCateEstimatorMixin, NonParamDML):
         W, X are None, then we call `split(ones((T.shape[0], 1)), T)`.
 
     n_crossfit_splits: int or 'raise', optional (default='raise')
-        Deprecated by parameter `n_splits` and will be removed in next version. Can be used
-        interchangeably with `n_splits`.
+        Deprecated by parameter `cv` and will be removed in next version. Can be used
+        interchangeably with `cv`.
 
     mc_iters: int, optional (default=None)
         The number of times to rerun the first stage models to reduce the variance of the nuisances.
@@ -1351,7 +1366,7 @@ class ForestDML(ForestModelFinalCateEstimatorMixin, NonParamDML):
                  featurizer=None,
                  discrete_treatment=False,
                  categories='auto',
-                 n_splits=2,
+                 cv=2,
                  n_crossfit_splits='raise',
                  mc_iters=None,
                  mc_agg='mean',
@@ -1384,14 +1399,15 @@ class ForestDML(ForestModelFinalCateEstimatorMixin, NonParamDML):
         self.verbose = verbose
         self.n_crossfit_splits = n_crossfit_splits
         if self.n_crossfit_splits != 'raise':
-            n_splits = self.n_crossfit_splits
+            cv = self.n_crossfit_splits
         super().__init__(model_y=model_y,
                          model_t=model_t,
                          model_final=None,
                          featurizer=featurizer,
                          discrete_treatment=discrete_treatment,
                          categories=categories,
-                         n_splits=n_splits,
+                         cv=cv,
+                         n_splits='raise',
                          mc_iters=mc_iters,
                          mc_agg=mc_agg,
                          random_state=random_state)
@@ -1436,7 +1452,7 @@ class ForestDML(ForestModelFinalCateEstimatorMixin, NonParamDML):
             not in use by this method (as inference method does not require sample variance info).
         groups: (n,) vector, optional
             All rows corresponding to the same group will be kept together during splitting.
-            If groups is not None, the n_splits argument passed to this class's initializer
+            If groups is not None, the `cv` argument passed to this class's initializer
             must support a 'groups' argument to its split method.
         cache_values: bool, default False
             Whether to cache inputs and first stage results, which will allow refitting a different final model
@@ -1463,16 +1479,6 @@ class ForestDML(ForestModelFinalCateEstimatorMixin, NonParamDML):
         if model is not None:
             raise ValueError("Parameter `model_final` cannot be altered for this estimator!")
 
-    @property
-    def n_crossfit_splits(self):
-        return self.n_splits
-
-    @n_crossfit_splits.setter
-    def n_crossfit_splits(self, value):
-        if value != 'raise':
-            warn("Deprecated by parameter `n_splits` and will be removed in next version.")
-        self.n_splits = value
-
     def shap_values(self, X, *, feature_names=None, treatment_names=None, output_names=None):
         # SubsampleHonestForest can't be recognized by SHAP, but the tree entries are consistent with a tree in
         # a RandomForestRegressor, modify the class name in order to be identified as tree models.
@@ -1487,6 +1493,20 @@ class ForestDML(ForestModelFinalCateEstimatorMixin, NonParamDML):
                                         feature_names=feature_names,
                                         treatment_names=treatment_names, output_names=output_names)
     shap_values.__doc__ = LinearCateEstimator.shap_values.__doc__
+
+    #######################################################
+    # These should be removed once `n_splits` is deprecated
+    #######################################################
+
+    @property
+    def n_crossfit_splits(self):
+        return self.cv
+
+    @n_crossfit_splits.setter
+    def n_crossfit_splits(self, value):
+        if value != 'raise':
+            warn("Deprecated by parameter `n_crossfit_splits` and will be removed in next version.")
+        self.cv = value
 
 
 @deprecated("The DMLCateEstimator class has been renamed to DML; "
